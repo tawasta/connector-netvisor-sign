@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <record id="view_vismasign_partner_onboard_wizard_form" model="ir.ui.view">
+        <field name="name">vismasign.partner.onboard.wizard.form</field>
+        <field name="model">vismasign.partner.onboard.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Search Netvisor Sign organization">
+                <group>
+                    <field name="backend_id" readonly="1" />
+                </group>
+
+                <group>
+                    <field name="business_id" placeholder="1234567-1" />
+                </group>
+
+                <group>
+                    <button
+                        name="action_search"
+                        type="object"
+                        string="Search"
+                        class="btn-primary"
+                    />
+                    <button string="Close" special="cancel" class="btn-secondary" />
+                </group>
+
+                <group string="Results">
+                    <field name="line_ids" nolabel="1">
+                        <tree>
+                            <field name="name" />
+                            <field name="business_id" />
+                            <field name="organization_uuid" />
+                            <field name="authorized" />
+                        </tree>
+                    </field>
+                </group>
+            </form>
+        </field>
+    </record>
+
+</odoo>

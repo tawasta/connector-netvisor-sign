@@ -69,7 +69,7 @@
                         />
                         <field
                             name="as_organization_uuid"
-                            placeholder="Target Visma Sign organization UUID"
+                            placeholder="Target Netvisor Sign organization UUID"
                         />
                     </group>
 
@@ -85,7 +85,7 @@
                         <field name="category_name" placeholder="e.g. Agreements" />
                         <field
                             name="category_description"
-                            placeholder="Optional description shown in Visma Sign"
+                            placeholder="Optional description shown in Netvisor Sign"
                         />
                         <field name="category_uuid" readonly="1" />
                     </group>
@@ -98,6 +98,7 @@
                     <group string="Signing behavior (optional)">
                         <field name="default_sign_as_organization" />
                         <field name="default_sign_as_inviter_organization" />
+                        <field name="allow_multiple_signers" />
                     </group>
                 </sheet>
             </form>
@@ -118,7 +119,7 @@
     </record>
 
     <record id="action_vismasign_backend" model="ir.actions.act_window">
-        <field name="name">Visma Sign Backends</field>
+        <field name="name">Netvisor Sign Backends</field>
         <field name="res_model">vismasign.backend</field>
         <field name="view_mode">tree,form</field>
     </record>
@@ -126,7 +127,7 @@
     <menuitem
         id="menu_vismasign_root"
         parent="connector.menu_connector_root"
-        name="Visma Sign"
+        name="Netvisor Sign"
         sequence="10"
         groups="connector.group_connector_manager"
     />

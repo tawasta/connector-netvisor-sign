@@ -1,8 +1,8 @@
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
-[![Pipeline Status](https://gitlab.com/tawasta/odoo/connector_vismasign/badges/17.0-dev/pipeline.svg)](https://gitlab.com/tawasta/odoo/connector_vismasign/-/pipelines/)
+[![Pre-commit Status](https://github.com/tawasta/connector-netvisor-sign/actions/workflows/pre-commit.yml/badge.svg?branch=17.0)](https://github.com/tawasta/connector-netvisor-sign/actions/workflows/pre-commit.yml?query=branch%3A17.0)
 
-VismaSign
-=========
+NetvisorSign
+============
 
 [//]: # (addons)
 
@@ -10,7 +10,7 @@ Available addons
 ----------------
 addon | version | maintainers | summary
 --- | --- | --- | ---
-[agreement_vismasign](agreement_vismasign/) | 17.0.1.0.1 |  | Agreement vismasign
-[connector_vismasign](connector_vismasign/) | 17.0.1.0.1 |  | Visma Sign Connector
+[agreement_netvisorsign](agreement_netvisorsign/) | 17.0.1.1.1 |  | Agreement Netvisor Sign
+[connector_netvisorsign](connector_netvisorsign/) | 17.0.1.1.0 |  | Netvisor Sign Connector
 
 [//]: # (end addons)

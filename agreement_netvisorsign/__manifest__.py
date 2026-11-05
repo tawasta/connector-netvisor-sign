@@ -18,11 +18,11 @@
 #
 ##############################################################################
 {
-    "name": "Agreement vismasign",
-    "summary": "Agreement vismasign",
-    "version": "17.0.1.0.1",
+    "name": "Agreement Netvisor Sign",
+    "summary": "Agreement Netvisor Sign",
+    "version": "17.0.1.1.1",
     "category": "Contract",
-    "website": "https://gitlab.com/tawasta/odoo/connector_vismasign",
+    "website": "https://github.com/tawasta/connector-netvisor-sign",
     "author": "Tawasta",
     "license": "AGPL-3",
     "application": False,
@@ -30,9 +30,12 @@
     "depends": [
         "agreement",
         "agreement_sale",
-        "connector_vismasign",
+        "connector_netvisorsign",
+        "sales_team",
     ],
     "data": [
+        "security/ir.model.access.csv",
+        "security/ir_rule.xml",
         "data/ir_cron.xml",
         "views/res_config_settings_views.xml",
         "views/agreement.xml",

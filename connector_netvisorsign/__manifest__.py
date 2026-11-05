@@ -18,11 +18,11 @@
 #
 ##############################################################################
 {
-    "name": "Visma Sign Connector",
-    "summary": "Visma Sign Connector",
-    "version": "17.0.1.0.1",
+    "name": "Netvisor Sign Connector",
+    "summary": "Netvisor Sign Connector",
+    "version": "17.0.1.1.0",
     "category": "Website",
-    "website": "https://gitlab.com/tawasta/odoo/connector_vismasign",
+    "website": "https://github.com/tawasta/connector-netvisor-sign",
     "author": "Tawasta",
     "license": "AGPL-3",
     "application": False,

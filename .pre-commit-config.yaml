@@ -47,7 +47,7 @@ repos:
       # update the NOT INSTALLABLE ADDONS section above
       - id: oca-update-pre-commit-excluded-addons
       - id: oca-fix-manifest-website
-        args: ["https://gitlab.com/tawasta/odoo/connector_vismasign"]
+        args: ["https://github.com/tawasta/connector-netvisor-sign"]
       - id: oca-gen-addon-readme
         args:
           - --addons-dir=.

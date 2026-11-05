@@ -25,7 +25,7 @@ class SaleOrder(models.Model):
     def action_create_agreement(self):
         """Create the agreement to be signed for this quotation.
 
-        The agreement type set on the order (and the Visma Sign report
+        The agreement type set on the order (and the Netvisor Sign report
         configured on it) determines which document is generated once the
         agreement is sent for signature.
         """

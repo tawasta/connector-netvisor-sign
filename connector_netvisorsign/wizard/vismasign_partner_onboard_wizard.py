@@ -10,7 +10,7 @@ _logger = logging.getLogger(__name__)
 
 class VismaSignPartnerOnboardWizard(models.TransientModel):
     _name = "vismasign.partner.onboard.wizard"
-    _description = "Visma Sign Partner Organization Search"
+    _description = "Netvisor Sign Partner Organization Search"
 
     backend_id = fields.Many2one("vismasign.backend", required=True, readonly=True)
     business_id = fields.Char(string="Business ID (Y-tunnus)", required=True)
@@ -86,7 +86,7 @@ class VismaSignPartnerOnboardWizard(models.TransientModel):
 
 class VismaSignPartnerOnboardWizardLine(models.TransientModel):
     _name = "vismasign.partner.onboard.wizard.line"
-    _description = "Visma Sign Partner Organization Search Result"
+    _description = "Netvisor Sign Partner Organization Search Result"
 
     wizard_id = fields.Many2one(
         "vismasign.partner.onboard.wizard",

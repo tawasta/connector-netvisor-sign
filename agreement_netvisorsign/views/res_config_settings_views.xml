@@ -11,10 +11,10 @@
             <xpath expr="//form" position="inside">
                 <app
                     string="Agreements"
-                    name="agreement_vismasign"
+                    name="agreement_netvisorsign"
                     groups="base.group_system"
                 >
-                    <block name="agreement_vismasign_block" title="Visma Sign">
+                    <block name="agreement_vismasign_block" title="Netvisor Sign">
                         <setting
                             id="agreement_vismasign_auto_create_agreement_on_confirm"
                             string="Auto-create Agreement on Order Confirmation"
@@ -36,7 +36,7 @@
         <field name="res_model">res.config.settings</field>
         <field name="view_mode">form</field>
         <field name="target">inline</field>
-        <field name="context">{'module': 'agreement_vismasign'}</field>
+        <field name="context">{'module': 'agreement_netvisorsign'}</field>
     </record>
 
     <record id="agreement.agreement_setting_menu" model="ir.ui.menu">

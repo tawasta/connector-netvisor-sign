@@ -17,15 +17,15 @@ _logger = logging.getLogger(__name__)
 
 class VismaSignBackend(models.Model):
     """
-    Backend connector for communicating with the Visma Sign API.
+    Backend connector for communicating with the Netvisor Sign API.
 
     Supports TWO auth modes:
-      1) HMAC (customer has their own Visma Sign credentials)
+      1) HMAC (customer has their own Netvisor Sign credentials)
       2) Partner OAuth2 (you use your partner credentials)
     """
 
     _name = "vismasign.backend"
-    _description = "Visma Sign Backend"
+    _description = "Netvisor Sign Backend"
     _inherit = "connector.backend"
     _rec_name = "company_id"
 
@@ -40,7 +40,7 @@ class VismaSignBackend(models.Model):
         required=True,
         default="hmac",
         help=(
-            "HMAC: customer enters their own Visma Sign API credentials.\n"
+            "HMAC: customer enters their own Netvisor Sign API credentials.\n"
             "Partner: you use partner OAuth2 credentials + 'as_organization' to act on behalf of this customer's org."  # noqa: E501
         ),
     )
@@ -77,19 +77,19 @@ class VismaSignBackend(models.Model):
     category_name = fields.Char(
         string="Default category (name)",
         help=(
-            "Visma Sign category name to use for created documents. "
+            "Netvisor Sign category name to use for created documents. "
             "If set, the backend will resolve/create the category and attach it to documents."  # noqa: E501
         ),
     )
     category_description = fields.Text(
         string="Category description",
-        help="Optional description used only when creating the category in Visma Sign.",
+        help="Optional description used only when creating the category in Netvisor Sign.",
     )
     category_uuid = fields.Char(
         string="Default category UUID",
         readonly=True,
         help=(
-            "Resolved/created Visma Sign category UUID (cached). "
+            "Resolved/created Netvisor Sign category UUID (cached). "
             "Cleared automatically if name/description changes or organization changes."
         ),
     )
@@ -113,6 +113,12 @@ class VismaSignBackend(models.Model):
         default=False,
         help="Only used if sign_as_organization is true. If enabled, invitations will default to "  # noqa: E501
         "sign_as_inviter_organization=true unless overridden.",
+    )
+
+    allow_multiple_signers = fields.Boolean(
+        default=False,
+        help="If enabled, a document can be sent to several signers at once. "
+        "If disabled, only one signer per document is allowed.",
     )
 
     @api.constrains(
@@ -384,12 +390,12 @@ class VismaSignBackend(models.Model):
 
         if successful:
             raise UserError(
-                _("Connection successful. Visma Sign responded with status %s.")
+                _("Connection successful. Netvisor Sign responded with status %s.")
                 % resp.status_code
             )
 
         raise UserError(
-            _("Unexpected status code from Visma Sign: %s\n%s")
+            _("Unexpected status code from Netvisor Sign: %s\n%s")
             % (resp.status_code, resp.text)
         )
 
@@ -611,7 +617,7 @@ class VismaSignBackend(models.Model):
             )
 
             if not org_uuid:
-                raise UserError(_("Visma Sign returned an organization without UUID."))
+                raise UserError(_("Netvisor Sign returned an organization without UUID."))
 
             if authorized:
                 self.write({"as_organization_uuid": org_uuid})
@@ -675,7 +681,7 @@ class VismaSignBackend(models.Model):
 
         if response.status_code != 200:
             raise UserError(
-                _("Visma Sign get categories failed: %s\n%s")
+                _("Netvisor Sign get categories failed: %s\n%s")
                 % (response.status_code, response.text)
             )
 
@@ -708,14 +714,14 @@ class VismaSignBackend(models.Model):
 
         if response.status_code != 201:
             raise UserError(
-                _("Failed to create category in Visma Sign:\n%s") % response.text
+                _("Failed to create category in Netvisor Sign:\n%s") % response.text
             )
 
         location = response.headers.get("Location") or ""
         category_uuid = location.rstrip("/").split("/")[-1]
         if not category_uuid:
             raise UserError(
-                _("Visma Sign did not return category uuid in Location header.")
+                _("Netvisor Sign did not return category uuid in Location header.")
             )
         return category_uuid
 
@@ -780,7 +786,7 @@ class VismaSignBackend(models.Model):
         )
         if response.status_code != 201:
             raise UserError(
-                _("Failed to create document in Visma Sign:\n%s") % response.text
+                _("Failed to create document in Netvisor Sign:\n%s") % response.text
             )
 
         location = response.headers.get("Location") or ""
@@ -814,30 +820,19 @@ class VismaSignBackend(models.Model):
 
         if response.status_code != 201:
             raise UserError(
-                _("Visma Sign add file failed: %s\n%s")
+                _("Netvisor Sign add file failed: %s\n%s")
                 % (response.status_code, response.text)
             )
 
         file_uuid = response_data.get("uuid")
         if not file_uuid:
-            raise UserError(_("Visma Sign did not return file uuid."))
+            raise UserError(_("Netvisor Sign did not return file uuid."))
 
         return file_uuid
 
-    def send_invitation(self, document_uuid, recipient_email):
+    def _prepare_invitation(self, recipient_email):
+        """Build the invitation of one recipient from the backend defaults."""
         self.ensure_one()
-        path = f"/api/v1/document/{document_uuid}/invitations"
-
-        if (
-            self.default_sign_as_inviter_organization
-            and not self.default_sign_as_organization
-        ):
-            raise UserError(
-                _(
-                    "Default 'sign as inviter's organization' requires 'sign as organization' to be enabled."  # noqa: E501
-                )
-            )
-
         invite = {"email": recipient_email, "messages": {"send_invitation_email": True}}
 
         if self.default_sign_as_organization:
@@ -849,14 +844,56 @@ class VismaSignBackend(models.Model):
         if inviter_payload:
             invite["inviter"] = inviter_payload
 
-        body = json.dumps([invite]).encode("utf-8")
+        return invite
+
+    def send_invitation(self, document_uuid, recipient_email):
+        """Send signing invitations of a document.
+
+        :param document_uuid: uuid of the Netvisor Sign document
+        :param recipient_email: one email address, or a list of them when
+            ``allow_multiple_signers`` is enabled on the backend. Netvisor Sign
+            requires all invitations of a document to be created at once.
+        :return: list of created invitations (uuid, status, passphrase). The
+            order is not documented to match the recipients, so match them
+            by email using ``get_document``.
+        """
+        self.ensure_one()
+        path = f"/api/v1/document/{document_uuid}/invitations"
+
+        recipient_emails = (
+            list(recipient_email)
+            if isinstance(recipient_email, list | tuple)
+            else [recipient_email]
+        )
+        if not recipient_emails:
+            raise UserError(_("At least one recipient is required."))
+        if len(recipient_emails) > 1 and not self.allow_multiple_signers:
+            raise UserError(
+                _(
+                    "Multiple signers are not allowed. Enable 'Allow multiple "
+                    "signers' on the Netvisor Sign backend."
+                )
+            )
+
+        if (
+            self.default_sign_as_inviter_organization
+            and not self.default_sign_as_organization
+        ):
+            raise UserError(
+                _(
+                    "Default 'sign as inviter's organization' requires 'sign as organization' to be enabled."  # noqa: E501
+                )
+            )
+
+        invites = [self._prepare_invitation(email) for email in recipient_emails]
+        body = json.dumps(invites).encode("utf-8")
 
         binding = self.env["vismasign.binding"].create(
             {
                 "backend_id": self.id,
                 "method": "POST",
                 "endpoint": path,
-                "payload": json.dumps([invite], ensure_ascii=False, indent=2),
+                "payload": json.dumps(invites, ensure_ascii=False, indent=2),
             }
         )
 
@@ -877,11 +914,49 @@ class VismaSignBackend(models.Model):
 
         if response.status_code != 201:
             raise UserError(
-                _("Visma Sign send invitation failed: %s\n%s")
+                _("Netvisor Sign send invitation failed: %s\n%s")
                 % (response.status_code, response.text)
             )
 
         return response_data
+
+    def get_document(self, document_uuid):
+        """Return the document with its status and all of its invitations.
+
+        The document is ``signed`` only when every invitation is fulfilled.
+        """
+        self.ensure_one()
+        path = f"/api/v1/document/{document_uuid}"
+
+        binding = self.env["vismasign.binding"].create(
+            {"backend_id": self.id, "method": "GET", "endpoint": path}
+        )
+
+        response = self._request("GET", path)
+
+        try:
+            data = response.json()
+            response_text = json.dumps(data, ensure_ascii=False, indent=2)
+        except ValueError:
+            data = {}
+            response_text = response.text
+
+        binding.write(
+            {
+                "status_code": response.status_code,
+                "response": response_text,
+                "successful": response.status_code == 200,
+            }
+        )
+
+        if response.status_code != 200:
+            raise UserError(
+                _("Netvisor Sign get document failed: %s\n%s")
+                % (response.status_code, response.text)
+            )
+
+        # A document is always an object; callers read its keys directly
+        return data if isinstance(data, dict) else {}
 
     def get_invitation_status(self, invitation_uuid):
         self.ensure_one()
@@ -910,7 +985,7 @@ class VismaSignBackend(models.Model):
 
         if response.status_code != 200:
             raise UserError(
-                _("Visma Sign get invitation status failed: %s\n%s")
+                _("Netvisor Sign get invitation status failed: %s\n%s")
                 % (response.status_code, response.text)
             )
 
@@ -940,7 +1015,7 @@ class VismaSignBackend(models.Model):
                 }
             )
             raise UserError(
-                _("Visma Sign get document file failed: %s\n%s")
+                _("Netvisor Sign get document file failed: %s\n%s")
                 % (response.status_code, response_text)
             )
 
@@ -985,7 +1060,7 @@ class VismaSignBackend(models.Model):
 
         return {
             "type": "ir.actions.act_window",
-            "name": _("Send Visma Sign partner invite"),
+            "name": _("Send Netvisor Sign partner invite"),
             "res_model": "vismasign.partner.invite.wizard",
             "view_mode": "form",
             "target": "new",

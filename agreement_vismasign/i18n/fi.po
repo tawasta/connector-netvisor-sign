@@ -123,6 +123,7 @@ msgid "Settings"
 msgstr "Asetukset"
 
 #. module: agreement_vismasign
+#: model:ir.model.fields,field_description:agreement_vismasign.field_agreement_vismasign_signer__status
 #: model_terms:ir.ui.view,arch_db:agreement_vismasign.view_agreement_form_inherit_vismasign
 msgid "Status"
 msgstr "Tila"
@@ -213,3 +214,121 @@ msgstr "Tila tarkistettu viimeksi"
 #: model:ir.model.fields,field_description:agreement_vismasign.field_agreement__vismasign_status
 msgid "Vismasign Status"
 msgstr "Allekirjoituksen tila"
+
+#. module: agreement_vismasign
+#. odoo-python
+#: code:addons/agreement_vismasign/models/agreement.py:0
+#, python-format
+msgid "This agreement has already been sent to Visma Sign."
+msgstr "Sopimus on jo lähetetty Visma Signiin."
+
+#. module: agreement_vismasign
+#. odoo-python
+#: code:addons/agreement_vismasign/models/agreement.py:0
+#, python-format
+msgid ""
+"The Visma Sign backend does not allow multiple signers. Remove the "
+"additional signers to send the signature request to the customer only."
+msgstr ""
+"Visma Sign -backend ei salli useita allekirjoittajia. Poista "
+"lisäallekirjoittajat, jos haluat lähettää allekirjoituspyynnön vain "
+"asiakkaalle."
+
+#. module: agreement_vismasign
+#. odoo-python
+#: code:addons/agreement_vismasign/models/agreement.py:0
+#, python-format
+msgid ""
+"Each signer needs a different email address. Remove the duplicate or change "
+"the email address."
+msgstr ""
+"Jokaisella allekirjoittajalla on oltava eri sähköpostiosoite. Poista "
+"kaksoiskappale tai vaihda sähköpostiosoite."
+
+#. module: agreement_vismasign
+#: model:ir.model,name:agreement_vismasign.model_agreement_vismasign_signer
+msgid "Agreement Visma Sign Signer"
+msgstr "Sopimuksen Visma Sign -allekirjoittaja"
+
+#. module: agreement_vismasign
+#: model:ir.model.fields,field_description:agreement_vismasign.field_agreement_vismasign_signer__agreement_id
+msgid "Agreement"
+msgstr "Sopimus"
+
+#. module: agreement_vismasign
+#: model:ir.model.fields,field_description:agreement_vismasign.field_agreement_vismasign_signer__company_id
+msgid "Company"
+msgstr "Yritys"
+
+#. module: agreement_vismasign
+#: model:ir.model.fields,field_description:agreement_vismasign.field_agreement_vismasign_signer__role
+msgid "Role"
+msgstr "Rooli"
+
+#. module: agreement_vismasign
+#: model:ir.model.fields.selection,name:agreement_vismasign.selection__agreement_vismasign_signer__role__customer
+msgid "Customer"
+msgstr "Asiakas"
+
+#. module: agreement_vismasign
+#: model:ir.model.fields.selection,name:agreement_vismasign.selection__agreement_vismasign_signer__role__company
+msgid "Additional signer"
+msgstr "Lisäallekirjoittaja"
+
+#. module: agreement_vismasign
+#: model:ir.model.fields,field_description:agreement_vismasign.field_agreement_vismasign_signer__partner_id
+msgid "Signer"
+msgstr "Allekirjoittaja"
+
+#. module: agreement_vismasign
+#: model:ir.model.fields,field_description:agreement_vismasign.field_agreement_vismasign_signer__email
+msgid "Email"
+msgstr "Sähköposti"
+
+#. module: agreement_vismasign
+#: model:ir.model.fields,field_description:agreement_vismasign.field_agreement_vismasign_signer__invitation_uuid
+msgid "Invitation Uuid"
+msgstr "Kutsun tunniste"
+
+#. module: agreement_vismasign
+#: model:ir.model.fields,field_description:agreement_vismasign.field_agreement__vismasign_signer_ids
+msgid "Visma Sign Signers"
+msgstr "Visma Sign -allekirjoittajat"
+
+#. module: agreement_vismasign
+#: model:ir.model.fields,help:agreement_vismasign.field_agreement__vismasign_signer_ids
+msgid ""
+"People who sign in addition to the customer. The customer is added "
+"automatically. Available when the Visma Sign backend allows multiple "
+"signers."
+msgstr ""
+"Henkilöt, jotka allekirjoittavat asiakkaan lisäksi. Asiakas lisätään "
+"automaattisesti. Käytettävissä, kun Visma Sign -backend sallii useita "
+"allekirjoittajia."
+
+#. module: agreement_vismasign
+#: model:ir.model.fields,field_description:agreement_vismasign.field_agreement__vismasign_allow_multiple_signers
+msgid "Vismasign Allow Multiple Signers"
+msgstr "Backend sallii useita allekirjoittajia"
+
+#. module: agreement_vismasign
+#: model:ir.model.fields,help:agreement_vismasign.field_agreement__vismasign_allow_multiple_signers
+msgid ""
+"Technical field: the Visma Sign backend of the company allows several "
+"signers per document."
+msgstr ""
+"Tekninen kenttä: yrityksen Visma Sign -backend sallii dokumentille useita "
+"allekirjoittajia."
+
+#. module: agreement_vismasign
+#: model_terms:ir.ui.view,arch_db:agreement_vismasign.view_agreement_form_inherit_vismasign
+msgid "Signers"
+msgstr "Allekirjoittajat"
+
+#. module: agreement_vismasign
+#: model_terms:ir.ui.view,arch_db:agreement_vismasign.view_agreement_form_inherit_vismasign
+msgid ""
+"The customer is added automatically. Add other people who also need to sign."
+msgstr ""
+"Asiakas lisätään automaattisesti. Lisää muut henkilöt, joiden pitää myös "
+"allekirjoittaa."

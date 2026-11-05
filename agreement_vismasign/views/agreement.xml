@@ -14,13 +14,38 @@
                         type="object"
                         string="Send for Signature"
                         class="btn-primary"
-                        invisible="is_template or vismasign_invitation_uuid"
+                        invisible="is_template or vismasign_document_uuid"
                     />
                 </header>
             </xpath>
 
             <xpath expr="//notebook" position="inside">
                 <page name="vismasign" string="Visma Sign">
+                    <field name="vismasign_allow_multiple_signers" invisible="1" />
+                    <div
+                        name="vismasign_signers"
+                        invisible="is_template or (not vismasign_allow_multiple_signers and not vismasign_signer_ids)"
+                    >
+                        <separator string="Signers" />
+                        <p class="text-muted" invisible="vismasign_document_uuid">
+                            The customer is added automatically. Add other people who also need to sign.
+                        </p>
+                        <field
+                            name="vismasign_signer_ids"
+                            readonly="vismasign_document_uuid"
+                        >
+                            <tree editable="bottom">
+                                <field name="company_id" column_invisible="1" />
+                                <field name="role" />
+                                <field
+                                    name="partner_id"
+                                    options="{'no_create': True}"
+                                />
+                                <field name="email" />
+                                <field name="status" widget="badge" />
+                            </tree>
+                        </field>
+                    </div>
                     <group>
                         <group string="Status">
                             <field name="vismasign_status" readonly="1" />

@@ -28,7 +28,10 @@ Features
 * Document creation (``/api/v1/document/``)
 * PDF file upload to a document
 * Sending signing invitations
+* Optional support for several signers per document (``Allow multiple
+  signers`` on the backend, disabled by default)
 * Fetching invitation status
+* Fetching a document with its status and all of its invitations
 * Downloading document files via the API (e.g. signed PDF)
 * Request/response logging in ``vismasign.binding`` (for debugging and audit)
 * “Test Connection” tool for validating configuration (logs the test call into bindings)
@@ -64,6 +67,7 @@ This module:
   - ``add_file(document_uuid, filename, pdf_data)``
   - ``send_invitation(document_uuid, recipient_email)``
   - ``get_invitation_status(invitation_uuid)``
+  - ``get_document(document_uuid)``
   - ``get_document_file(document_uuid, index=0)``
 
 Other modules:
@@ -126,6 +130,8 @@ Configuration
    * **Default document category (name/description)**: the module will resolve/create the category and cache its UUID
    * **Inviter (name/email)**: sent in invitation payload when set
    * **Signing behavior defaults**: defaults applied when sending invitations
+   * **Allow multiple signers**: allow sending a document to several signers
+     at once. Disabled by default, so only one signer per document is allowed
 
 6. Click **Test Connection**.
 
@@ -160,9 +166,24 @@ Other modules can import and use the connector like this:
   * ``inviter`` block (name/email) if configured
   * default signing flags (``sign_as_organization`` / ``sign_as_inviter_organization``) if enabled on the backend
 
+  To invite several signers, pass a list of emails. Visma Sign creates all
+  invitations of a document at once, so they are sent in one request. This
+  requires **Allow multiple signers** on the backend; otherwise passing more
+  than one email raises an error:
+
+  ``inv = backend.send_invitation(uuid, [email_1, email_2])``
+
+  The order of the returned invitations is not documented to match the
+  emails, so match them by email using ``get_document``.
+
 * Check invitation status:
 
   ``status = backend.get_invitation_status(invitation_uuid)``
+
+* Get a document with its status and all of its invitations (the document is
+  ``signed`` only when every invitation is fulfilled):
+
+  ``document = backend.get_document(uuid)``
 
 * Download a document file (e.g. signed PDF):
 

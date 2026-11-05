@@ -18,6 +18,13 @@ Features
 * Select the document template per agreement type, so lease agreements and
   the different sale agreement templates each use their own report
 * Send agreements to Visma Sign directly from the agreement form
+* Add one or more additional signers on the agreement, in addition to the
+  customer. Any contact with an email address can be a signer, for example a
+  company representative, and the number of signers is not limited. This
+  requires **Allow multiple signers** on the Visma Sign backend; without it
+  the signature request goes to the customer only
+* Track the signing status of each signer. The agreement is signed only when
+  every signer has signed
 * Attach a local copy of the rendered (unsigned) document for audit purposes
 * Store Visma Sign document, file, and invitation UUIDs on the agreement
 * Automatic signature status synchronization using a scheduled action
@@ -43,6 +50,11 @@ Configuration
    This is required before an agreement of that type can be sent for
    signature.
 
+#. To send agreements to additional signers too, enable **Allow
+   multiple signers** on the company's Visma Sign backend (*Connectors ->
+   Visma Sign -> Backends*). It is disabled by default, and then agreements
+   are sent to the customer only as before.
+
 #. Ensure that a Visma Sign backend is configured for the company (requires
    the **Connector Manager** group (``connector.group_connector_manager``) —
    see ``connector_vismasign``'s README). Sending an agreement itself does
@@ -61,6 +73,16 @@ Usage
 
 #. Open the agreement (not a template).
 
+#. If the backend allows multiple signers, the *Visma Sign* tab shows the
+   **Signers** list. Add one or more contacts to it to send the signature
+   request to them in addition to the customer. The customer is added
+   automatically when the request is sent, and each signer needs a different
+   email address. Without additional signers the request goes to the customer
+   only.
+
+   The list cannot be changed after the request has been sent, because
+   Visma Sign creates all invitations of a document at the same time.
+
 #. Click:
 
    ::
@@ -73,11 +95,15 @@ Usage
    * attach the rendered PDF to the agreement as an audit-trail copy
    * create a Visma Sign document
    * upload the PDF
-   * send the signature invitation to the partner
+   * send the signature invitation to the partner, or the invitations to all
+     signers in one request
 
 #. Signature status is updated automatically every 15 minutes using a cron job.
+   For several signers the agreement status shows the status of the Visma
+   Sign document (for example ``pending`` or ``signed``), and each signer's
+   status is shown on the signer list.
 
-#. Once the agreement has been signed:
+#. Once the agreement has been signed (by every signer):
 
    * the signed PDF is downloaded automatically
    * the signed document is attached to the agreement
@@ -106,9 +132,14 @@ The following technical fields are added to the agreement:
 
 * ``vismasign_document_uuid``
 * ``vismasign_file_uuid``
-* ``vismasign_invitation_uuid``
+* ``vismasign_invitation_uuid`` (only filled when the request was sent to
+  the customer only)
 * ``vismasign_status``
 * ``vismasign_last_check``
+* ``vismasign_signer_ids``: the additional signers added before sending
+  and, once sent to several signers, all signers
+  (``agreement.vismasign.signer``) with their role, email, invitation UUID and
+  status
 
 Agreement Type Fields
 ----------------------

@@ -115,6 +115,12 @@ class VismaSignBackend(models.Model):
         "sign_as_inviter_organization=true unless overridden.",
     )
 
+    allow_multiple_signers = fields.Boolean(
+        default=False,
+        help="If enabled, a document can be sent to several signers at once. "
+        "If disabled, only one signer per document is allowed.",
+    )
+
     @api.constrains(
         "default_sign_as_organization", "default_sign_as_inviter_organization"
     )
@@ -824,20 +830,9 @@ class VismaSignBackend(models.Model):
 
         return file_uuid
 
-    def send_invitation(self, document_uuid, recipient_email):
+    def _prepare_invitation(self, recipient_email):
+        """Build the invitation of one recipient from the backend defaults."""
         self.ensure_one()
-        path = f"/api/v1/document/{document_uuid}/invitations"
-
-        if (
-            self.default_sign_as_inviter_organization
-            and not self.default_sign_as_organization
-        ):
-            raise UserError(
-                _(
-                    "Default 'sign as inviter's organization' requires 'sign as organization' to be enabled."  # noqa: E501
-                )
-            )
-
         invite = {"email": recipient_email, "messages": {"send_invitation_email": True}}
 
         if self.default_sign_as_organization:
@@ -849,14 +844,56 @@ class VismaSignBackend(models.Model):
         if inviter_payload:
             invite["inviter"] = inviter_payload
 
-        body = json.dumps([invite]).encode("utf-8")
+        return invite
+
+    def send_invitation(self, document_uuid, recipient_email):
+        """Send signing invitations of a document.
+
+        :param document_uuid: uuid of the Visma Sign document
+        :param recipient_email: one email address, or a list of them when
+            ``allow_multiple_signers`` is enabled on the backend. Visma Sign
+            requires all invitations of a document to be created at once.
+        :return: list of created invitations (uuid, status, passphrase). The
+            order is not documented to match the recipients, so match them
+            by email using ``get_document``.
+        """
+        self.ensure_one()
+        path = f"/api/v1/document/{document_uuid}/invitations"
+
+        recipient_emails = (
+            list(recipient_email)
+            if isinstance(recipient_email, list | tuple)
+            else [recipient_email]
+        )
+        if not recipient_emails:
+            raise UserError(_("At least one recipient is required."))
+        if len(recipient_emails) > 1 and not self.allow_multiple_signers:
+            raise UserError(
+                _(
+                    "Multiple signers are not allowed. Enable 'Allow multiple "
+                    "signers' on the Visma Sign backend."
+                )
+            )
+
+        if (
+            self.default_sign_as_inviter_organization
+            and not self.default_sign_as_organization
+        ):
+            raise UserError(
+                _(
+                    "Default 'sign as inviter's organization' requires 'sign as organization' to be enabled."  # noqa: E501
+                )
+            )
+
+        invites = [self._prepare_invitation(email) for email in recipient_emails]
+        body = json.dumps(invites).encode("utf-8")
 
         binding = self.env["vismasign.binding"].create(
             {
                 "backend_id": self.id,
                 "method": "POST",
                 "endpoint": path,
-                "payload": json.dumps([invite], ensure_ascii=False, indent=2),
+                "payload": json.dumps(invites, ensure_ascii=False, indent=2),
             }
         )
 
@@ -882,6 +919,44 @@ class VismaSignBackend(models.Model):
             )
 
         return response_data
+
+    def get_document(self, document_uuid):
+        """Return the document with its status and all of its invitations.
+
+        The document is ``signed`` only when every invitation is fulfilled.
+        """
+        self.ensure_one()
+        path = f"/api/v1/document/{document_uuid}"
+
+        binding = self.env["vismasign.binding"].create(
+            {"backend_id": self.id, "method": "GET", "endpoint": path}
+        )
+
+        response = self._request("GET", path)
+
+        try:
+            data = response.json()
+            response_text = json.dumps(data, ensure_ascii=False, indent=2)
+        except ValueError:
+            data = {}
+            response_text = response.text
+
+        binding.write(
+            {
+                "status_code": response.status_code,
+                "response": response_text,
+                "successful": response.status_code == 200,
+            }
+        )
+
+        if response.status_code != 200:
+            raise UserError(
+                _("Visma Sign get document failed: %s\n%s")
+                % (response.status_code, response.text)
+            )
+
+        # A document is always an object; callers read its keys directly
+        return data if isinstance(data, dict) else {}
 
     def get_invitation_status(self, invitation_uuid):
         self.ensure_one()

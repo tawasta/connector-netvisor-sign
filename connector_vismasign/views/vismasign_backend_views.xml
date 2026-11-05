@@ -98,6 +98,7 @@
                     <group string="Signing behavior (optional)">
                         <field name="default_sign_as_organization" />
                         <field name="default_sign_as_inviter_organization" />
+                        <field name="allow_multiple_signers" />
                     </group>
                 </sheet>
             </form>

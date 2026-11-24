@@ -5,7 +5,7 @@
         <field name="name">vismasign.partner.onboard.wizard.form</field>
         <field name="model">vismasign.partner.onboard.wizard</field>
         <field name="arch" type="xml">
-            <form string="Search Visma Sign organization">
+            <form string="Search Netvisor Sign organization">
                 <group>
                     <field name="backend_id" readonly="1" />
                 </group>

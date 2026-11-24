@@ -8,7 +8,7 @@ _logger = logging.getLogger(__name__)
 
 class VismaSignPartnerInviteWizard(models.TransientModel):
     _name = "vismasign.partner.invite.wizard"
-    _description = "Visma Sign Partner Invite (Business ID flow)"
+    _description = "Netvisor Sign Partner Invite (Business ID flow)"
 
     backend_id = fields.Many2one("vismasign.backend", required=True, readonly=True)
 
@@ -38,7 +38,7 @@ class VismaSignPartnerInviteWizard(models.TransientModel):
         string="Message",
         required=True,
         default=lambda self: _(
-            "Hei!\n\nVoitteko hyväksyä kutsun, jotta voimme liittää organisaationne Visma Sign -partnerimalliin "  # noqa: E501
+            "Hei!\n\nVoitteko hyväksyä kutsun, jotta voimme liittää organisaationne Netvisor Sign -partnerimalliin "  # noqa: E501
             "ja käyttää allekirjoituksia suoraan Odoosta?\n\nKiitos!"
         ),
     )
@@ -68,7 +68,7 @@ class VismaSignPartnerInviteWizard(models.TransientModel):
         org_uuid = result.get("organization_uuid")
 
         if action == "invite_sent":
-            msg = _("Access request sent to Visma Sign for organization %s.") % org_uuid
+            msg = _("Access request sent to Netvisor Sign for organization %s.") % org_uuid
             title = _("Invitation sent")
         elif action == "already_authorized":
             msg = _("Already authorized. Set as_organization_uuid to %s.") % org_uuid
@@ -76,14 +76,14 @@ class VismaSignPartnerInviteWizard(models.TransientModel):
         elif action == "created":
             msg = (
                 _(
-                    "Organization created in Visma Sign (%s). Set as_organization_uuid automatically."  # noqa: E501
+                    "Organization created in Netvisor Sign (%s). Set as_organization_uuid automatically."  # noqa: E501
                 )
                 % org_uuid
             )
             title = _("Organization created")
         else:
             msg = _("Done.")
-            title = _("Visma Sign")
+            title = _("Netvisor Sign")
 
         return {
             "type": "ir.actions.client",

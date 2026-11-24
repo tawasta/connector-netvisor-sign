@@ -2,7 +2,7 @@
 <odoo>
 
     <record id="ir_cron_update_vismasign_status_agreement" model="ir.cron">
-        <field name="name">Visma Sign: Update Invitation Status (Agreements)</field>
+        <field name="name">Netvisor Sign: Update Invitation Status (Agreements)</field>
         <field name="model_id" ref="agreement.model_agreement" />
         <field name="state">code</field>
         <field name="code">model.cron_update_vismasign_status()</field>

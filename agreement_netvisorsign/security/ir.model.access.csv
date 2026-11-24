@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_agreement_vismasign_signer_read,agreement.vismasign.signer read,model_agreement_vismasign_signer,base.group_user,1,0,0,0
+access_agreement_vismasign_signer_full,agreement.vismasign.signer full,model_agreement_vismasign_signer,base.group_system,1,1,1,1
+access_agreement_vismasign_signer_sale_manager,agreement.vismasign.signer sale manager,model_agreement_vismasign_signer,sales_team.group_sale_manager,1,1,1,1

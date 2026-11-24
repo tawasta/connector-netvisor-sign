@@ -3,7 +3,7 @@ from odoo import fields, models
 
 class VismaSignBinding(models.Model):
     _name = "vismasign.binding"
-    _description = "Visma Sign Binding Log"
+    _description = "Netvisor Sign Binding Log"
     _inherit = "external.binding"
     _order = "id DESC"
 

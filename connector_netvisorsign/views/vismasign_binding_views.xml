@@ -47,7 +47,7 @@
     </record>
 
     <record id="action_vismasign_binding" model="ir.actions.act_window">
-        <field name="name">Visma Sign Bindings</field>
+        <field name="name">Netvisor Sign Bindings</field>
         <field name="res_model">vismasign.binding</field>
         <field name="view_mode">tree,form</field>
     </record>
